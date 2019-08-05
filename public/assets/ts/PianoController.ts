@@ -1,5 +1,5 @@
 "use strict";
 
-export class PianoController {
+export class Keyboard {
    
 }

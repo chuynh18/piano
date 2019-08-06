@@ -2,12 +2,20 @@
 
 export const DECAY = {
    value: 0.8,
-   set: function(decay: number): number {
+   halfPedal: 7,
+   setDecay: function(decay: number): number {
       this.value = decay;
       return this.value;
    },
+   setHalfPedal: function(decay: number) : number {
+      this.halfPedal = decay;
+      return this.halfPedal;
+   },
    get: function(): number {
       return this.value;
+   },
+   gethalfPedal: function(): number {
+      return this.halfPedal;
    }
 }
 

@@ -1,6 +1,6 @@
 "use strict";
 
-import { KEY_COUNT } from "./Globals";
+import { DECAY, KEY_COUNT } from "./Globals";
 import { NoteConfig, Damper } from "./interfaces/PianoShared";
 import { KeyboardSound } from "./KeyboardSound";
 import { KeyboardView } from "./KeyboardView";
@@ -27,7 +27,7 @@ export class Keyboard {
    }
 
    public stopAll(force: boolean) {
-      const stillPlaying = this.sound.stopAllSamples(force);
+      const stillPlaying = this.sound.setNewDecayAllSamples(force, DECAY.get());
 
       for (let i = 0; i < KEY_COUNT; i++) {
          if (stillPlaying.indexOf(i) === -1) {
@@ -38,6 +38,7 @@ export class Keyboard {
 
    public setDamper(state: Damper) {
       if (this.damper >= state) {
+         console.log("Stopping all non-active notes");
          this.stopAll(false);
       }
 

@@ -3,12 +3,20 @@
 exports.__esModule = true;
 exports.DECAY = {
     value: 0.8,
-    set: function (decay) {
+    halfPedal: 7,
+    setDecay: function (decay) {
         this.value = decay;
         return this.value;
     },
+    setHalfPedal: function (decay) {
+        this.halfPedal = decay;
+        return this.halfPedal;
+    },
     get: function () {
         return this.value;
+    },
+    gethalfPedal: function () {
+        return this.halfPedal;
     }
 };
 exports.KEY_COUNT = 88;
@@ -50,6 +58,7 @@ var Keyboard = /** @class */ (function () {
     };
     Keyboard.prototype.setDamper = function (state) {
         if (this.damper >= state) {
+            console.log("Stopping all non-active notes");
             this.stopAll(false);
         }
         this.damper = state;
@@ -190,11 +199,11 @@ var KeyboardSound = /** @class */ (function () {
                     if (typeof cfg.decay === "number") {
                         noteNode.gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + cfg.decay);
                         noteNode.source.stop(this.ctx.currentTime + cfg.decay);
-                    }
-                    else {
-                        noteNode.gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + Globals_1.DECAY.get());
-                        noteNode.source.stop(this.ctx.currentTime + Globals_1.DECAY.get());
-                    }
+                    } // else {
+                    //    noteNode.gain!.gain.exponentialRampToValueAtTime(0.00001,
+                    //       this.ctx.currentTime + DECAY.get());
+                    //    noteNode.source!.stop(this.ctx.currentTime + DECAY.get());
+                    // }
                 }
                 catch (err) {
                     console.log(err);
@@ -292,6 +301,7 @@ exports.KeyboardView = KeyboardView;
 exports.__esModule = true;
 var Keyboard_1 = require("./Keyboard");
 var PianoShared_1 = require("./interfaces/PianoShared");
+var Globals_1 = require("./Globals");
 var ProgramState;
 (function (ProgramState) {
     ProgramState[ProgramState["Interactive"] = 0] = "Interactive";
@@ -309,6 +319,7 @@ var Player = /** @class */ (function () {
     Player.prototype.attachEventHandlers = function () {
         var _this = this;
         var rects = this.svg.getElementsByTagName("rect");
+        var damperText = document.getElementById("damper-state");
         var _loop_1 = function (i) {
             var key = rects[i];
             var cfg = {
@@ -326,13 +337,18 @@ var Player = /** @class */ (function () {
             key.addEventListener("mouseup", function () {
                 if (_this.mode === ProgramState.Interactive) {
                     var damperState = _this.keyboard.getDamper();
-                    if (damperState === PianoShared_1.Damper.Half) {
-                        cfg.decay = 5;
+                    if (damperState === PianoShared_1.Damper.None) {
+                        cfg.decay = Globals_1.DECAY.get();
+                        _this.keyboard.stop(cfg);
+                    }
+                    else if (damperState === PianoShared_1.Damper.Half) {
+                        cfg.decay = Globals_1.DECAY.gethalfPedal();
+                        _this.keyboard.stop(cfg);
                     }
                     else if (damperState === PianoShared_1.Damper.Full) {
-                        cfg.decay = 40;
+                        cfg.decay = undefined;
+                        _this.keyboard.stopVisuals(cfg);
                     }
-                    _this.keyboard.stop(cfg);
                 }
                 else if (_this.mode === ProgramState.Edit) {
                 }
@@ -340,13 +356,18 @@ var Player = /** @class */ (function () {
             key.addEventListener("mouseout", function () {
                 if (_this.mode === ProgramState.Interactive) {
                     var damperState = _this.keyboard.getDamper();
-                    if (damperState === PianoShared_1.Damper.Half) {
-                        cfg.decay = 5;
+                    if (damperState === PianoShared_1.Damper.None) {
+                        cfg.decay = Globals_1.DECAY.get();
+                        _this.keyboard.stop(cfg);
+                    }
+                    else if (damperState === PianoShared_1.Damper.Half) {
+                        cfg.decay = Globals_1.DECAY.gethalfPedal();
+                        _this.keyboard.stop(cfg);
                     }
                     else if (damperState === PianoShared_1.Damper.Full) {
-                        cfg.decay = 40;
+                        cfg.decay = undefined;
+                        _this.keyboard.stopVisuals(cfg);
                     }
-                    _this.keyboard.stop(cfg);
                 }
                 else if (_this.mode === ProgramState.Edit) {
                 }
@@ -355,12 +376,24 @@ var Player = /** @class */ (function () {
         for (var i = 0; i < rects.length; i++) {
             _loop_1(i);
         }
+        document.getElementById("damper0").addEventListener("click", function () {
+            _this.keyboard.setDamper(PianoShared_1.Damper.None);
+            damperText.textContent = "Off";
+        });
+        document.getElementById("damper1").addEventListener("click", function () {
+            _this.keyboard.setDamper(PianoShared_1.Damper.Half);
+            damperText.textContent = "Half";
+        });
+        document.getElementById("damper2").addEventListener("click", function () {
+            _this.keyboard.setDamper(PianoShared_1.Damper.Full);
+            damperText.textContent = "On";
+        });
     };
     return Player;
 }());
 exports.Player = Player;
 
-},{"./Keyboard":2,"./interfaces/PianoShared":6}],6:[function(require,module,exports){
+},{"./Globals":1,"./Keyboard":2,"./interfaces/PianoShared":6}],6:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var Damper;

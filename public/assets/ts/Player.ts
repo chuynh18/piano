@@ -2,6 +2,7 @@
 
 import { Keyboard } from "./Keyboard";
 import { NoteConfig, Damper } from "./interfaces/PianoShared";
+import { DECAY } from "./Globals";
 
 enum ProgramState {
    Interactive,
@@ -23,6 +24,7 @@ export class Player {
 
    private attachEventHandlers() {
       const rects = this.svg.getElementsByTagName("rect");
+      const damperText = document.getElementById("damper-state")!;
 
       for (let i = 0; i < rects.length; i++) {
          const key = rects[i];
@@ -44,13 +46,16 @@ export class Player {
             if (this.mode === ProgramState.Interactive) {
                const damperState = this.keyboard.getDamper();
 
-               if (damperState === Damper.Half) {
-                  cfg.decay = 5;
+               if (damperState === Damper.None) {
+                  cfg.decay = DECAY.get();
+                  this.keyboard.stop(cfg);
+               } else if (damperState === Damper.Half) {
+                  cfg.decay = DECAY.gethalfPedal();
+                  this.keyboard.stop(cfg);
                } else if (damperState === Damper.Full) {
-                  cfg.decay = 40;
+                  cfg.decay = undefined;
+                  this.keyboard.stopVisuals(cfg);
                }
-
-               this.keyboard.stop(cfg);
             } else if (this.mode === ProgramState.Edit) {
                
             }
@@ -60,17 +65,35 @@ export class Player {
             if (this.mode === ProgramState.Interactive) {
                const damperState = this.keyboard.getDamper();
 
-               if (damperState === Damper.Half) {
-                  cfg.decay = 5;
+               if (damperState === Damper.None) {
+                  cfg.decay = DECAY.get();
+                  this.keyboard.stop(cfg);
+               } else if (damperState === Damper.Half) {
+                  cfg.decay = DECAY.gethalfPedal();
+                  this.keyboard.stop(cfg);
                } else if (damperState === Damper.Full) {
-                  cfg.decay = 40;
+                  cfg.decay = undefined;
+                  this.keyboard.stopVisuals(cfg);
                }
-
-               this.keyboard.stop(cfg);
             } else if (this.mode === ProgramState.Edit) {
                
             }
          });
       }
+
+      document.getElementById("damper0")!.addEventListener("click", () => {
+         this.keyboard.setDamper(Damper.None);
+         damperText.textContent = "Off";
+      });
+
+      document.getElementById("damper1")!.addEventListener("click", () => {
+         this.keyboard.setDamper(Damper.Half);
+         damperText.textContent = "Half";
+      });
+
+      document.getElementById("damper2")!.addEventListener("click", () => {
+         this.keyboard.setDamper(Damper.Full);
+         damperText.textContent = "On";
+      });
    }
 }

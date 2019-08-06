@@ -153,12 +153,12 @@ export class KeyboardSound {
                      this.ctx.currentTime + cfg.decay);
                   
                   noteNode.source!.stop(this.ctx.currentTime + cfg.decay);
-               } else {
-                  noteNode.gain!.gain.exponentialRampToValueAtTime(0.00001,
-                     this.ctx.currentTime + DECAY.get());
+               } // else {
+               //    noteNode.gain!.gain.exponentialRampToValueAtTime(0.00001,
+               //       this.ctx.currentTime + DECAY.get());
 
-                  noteNode.source!.stop(this.ctx.currentTime + DECAY.get());
-               }
+               //    noteNode.source!.stop(this.ctx.currentTime + DECAY.get());
+               // }
                
             } catch (err) {
                console.log(err);
@@ -179,7 +179,7 @@ export class KeyboardSound {
     * 
     * @param  {boolean} force
     */
-   public stopAllSamples(force: boolean): number[] {
+   public setNewDecayAllSamples(force: boolean, decay: number): number[] {
       const activeNotes: number[] = [];
 
       for (let i = 0; i < this.samples.length; i++) {
@@ -189,9 +189,9 @@ export class KeyboardSound {
             if (force) {
                for (let i = 0; i < playing.length; i++) {
                   playing[i].gain!.gain.exponentialRampToValueAtTime(0.00001,
-                     this.ctx.currentTime + DECAY.get());
+                     this.ctx.currentTime + decay);
 
-                  playing[i].source!.stop(this.ctx.currentTime + DECAY.get());
+                  playing[i].source!.stop(this.ctx.currentTime + decay);
                }
 
                playing.length = 0;
@@ -199,9 +199,9 @@ export class KeyboardSound {
                for (let i = 0; i < playing.length; i++) {
                   if (!playing[i].active) {
                      playing[i].gain!.gain.exponentialRampToValueAtTime(0.00001,
-                        this.ctx.currentTime + DECAY.get());
+                        this.ctx.currentTime + decay);
    
-                     playing[i].source!.stop(this.ctx.currentTime + DECAY.get());
+                     playing[i].source!.stop(this.ctx.currentTime + decay);
                   } else {
                      if (activeNotes.indexOf(i + 1) !== -1) {
                         activeNotes.push(i + 1);

@@ -13,7 +13,13 @@
    <object id="kb" data="assets/img/fullpiano.svg" type="image/svg+xml">
       Check your SVG support!
    </object>
-   <button id="damper" onclick="togglePedal()">Damper pedal OFF</button>
+   <div>
+      <p>Damper state: <b><span id="damper-state">Off</span></b></p>
+      <p><button id="damper0">Damper pedal OFF</button></p>
+      <p><button id="damper1">Damper pedal HALF</button></p>
+      <p><button id="damper2">Damper pedal ON</button></p>
+   </div>
+   
    <script src="assets/js/tones.js"></script>
 </body>
 

@@ -1,5 +1,6 @@
 "use strict";
 
+import { DECAY } from "./Globals";
 import { SoundSample, NoteNode } from "./interfaces/KeyboardSound";
 import { NoteConfig } from "./interfaces/PianoShared";
 
@@ -16,12 +17,16 @@ import { NoteConfig } from "./interfaces/PianoShared";
  */
 export class KeyboardSound {
    private ctx: AudioContext = new AudioContext();
-   private samples: SoundSample[];
+   private samples: SoundSample[] = [];
 
    constructor(baseURL: string, ext: string, numFiles: number, callback?: Function) {
       for (let i = 0; i < numFiles; i++) {
          this.preload(`${baseURL}/${i + 1}.${ext}`, i, callback);
       }
+   }
+
+   public getSamplesLength() {
+      return this.samples.length;
    }
 
    /**
@@ -46,13 +51,13 @@ export class KeyboardSound {
       req.onload = () => {
          this.ctx.decodeAudioData(req.response,
          // named function expression to make stack traces prettier!
-         function loadSoundSample(buffer) {
+         buffer => {
             // put the downloaded audio file into note.buffer
             note.buffer = buffer;
 
             // put the note object into this.samples
             // note.source and note.gain will be created as needed later
-            this.note[index] = note;
+            this.samples[index] = note;
 
             // if callback was provided, call it!
             if (typeof callback === "function") {
@@ -80,7 +85,7 @@ export class KeyboardSound {
          gain: null
       };
 
-      const note = this.samples[cfg.key];
+      const note = this.samples[cfg.key - 1];
 
       // create and configure AudioBufferSourceNode
       noteNode.source = new AudioBufferSourceNode(this.ctx, {
@@ -95,6 +100,26 @@ export class KeyboardSound {
       // connect nodes to each other
       noteNode.source.connect(noteNode.gain);
       noteNode.gain.connect(this.ctx.destination);
+
+      // partial pedal during playback
+      if (typeof cfg.duration !== "undefined" && typeof cfg.decay !== "undefined") {
+         noteNode.active = true;
+
+         setTimeout(function() {
+            noteNode.active = false;
+            noteNode.gain!.gain.exponentialRampToValueAtTime(0.00001,
+               this.ctx.currentTime + cfg.decay);
+         }, cfg.duration);
+      // full pedal during playback
+      } else if (typeof cfg.duration !== "undefined") {
+         noteNode.active = true;
+
+         setTimeout(function() {
+            noteNode.active = false;
+         }, cfg.duration);
+      } else if (typeof cfg.decay !== "undefined") {
+         console.log("I guess this case does need to be addressed!");
+      }
 
       // play
       noteNode.source.start(0);
@@ -113,24 +138,28 @@ export class KeyboardSound {
     * @param  {NoteConfig} cfg  NoteConfig object, contains note and volume info.
     * @returns  {number}  The number of samples still being played for a given note.
     */
-   public stopPlaying(cfg: NoteConfig) {
+   public stopOldestSample(cfg: NoteConfig) {
       // check to ensure that sound samples are in fact being played
-      if (this.samples[cfg.key].playing.length > 0) {
+      if (this.samples[cfg.key - 1].playing.length > 0) {
          // shift out the oldest playing sample
-         const noteNode = this.samples[cfg.key].playing.shift();
+         const noteNode = this.samples[cfg.key - 1].playing.shift();
 
          if (typeof noteNode !== "undefined") {
-            if (typeof cfg.decay !== "number") {
-               throw new TypeError("decay must be a number.");
-            }
 
             try {
-               // decay the sound so that the piano sounds natural
-               noteNode.gain!.gain.exponentialRampToValueAtTime(0.00001,
-                  this.ctx.currentTime + cfg.decay);
+               // decay the sound first, then stop playing
+               if (typeof cfg.decay === "number") {
+                  noteNode.gain!.gain.exponentialRampToValueAtTime(0.00001,
+                     this.ctx.currentTime + cfg.decay);
+                  
+                  noteNode.source!.stop(this.ctx.currentTime + cfg.decay);
+               } else {
+                  noteNode.gain!.gain.exponentialRampToValueAtTime(0.00001,
+                     this.ctx.currentTime + DECAY.get());
+
+                  noteNode.source!.stop(this.ctx.currentTime + DECAY.get());
+               }
                
-               // stop playing
-               noteNode.source!.stop(this.ctx.currentTime + cfg.decay);
             } catch (err) {
                console.log(err);
             }
@@ -139,9 +168,55 @@ export class KeyboardSound {
          }
 
          // return new length of array holding the playing samples for the note
-         return this.samples[cfg.key].playing.length;
-      } else {
-         throw new ReferenceError(`Note index ${cfg.key} is currently not being played.`);
+         return this.samples[cfg.key - 1].playing.length;
       }
+   }
+   
+   /**
+    * Stops all inactive playing samples (e.g. samples that are currently playing
+    * that do not correspond to a note being actively pressed.)  If the force
+    * flag is set to true, all samples are stopped.
+    * 
+    * @param  {boolean} force
+    */
+   public stopAllSamples(force: boolean): number[] {
+      const activeNotes: number[] = [];
+
+      for (let i = 0; i < this.samples.length; i++) {
+         const playing = this.samples[i].playing;
+
+         if (playing.length > 0) {
+            if (force) {
+               for (let i = 0; i < playing.length; i++) {
+                  playing[i].gain!.gain.exponentialRampToValueAtTime(0.00001,
+                     this.ctx.currentTime + DECAY.get());
+
+                  playing[i].source!.stop(this.ctx.currentTime + DECAY.get());
+               }
+
+               playing.length = 0;
+            } else {
+               for (let i = 0; i < playing.length; i++) {
+                  if (!playing[i].active) {
+                     playing[i].gain!.gain.exponentialRampToValueAtTime(0.00001,
+                        this.ctx.currentTime + DECAY.get());
+   
+                     playing[i].source!.stop(this.ctx.currentTime + DECAY.get());
+                  } else {
+                     if (activeNotes.indexOf(i + 1) !== -1) {
+                        activeNotes.push(i + 1);
+                     }
+                  }
+
+                  this.samples[i].playing = playing.filter(val => {
+                     return val.active;
+                  });
+               }
+            }
+         }
+      }
+
+      console.log(activeNotes);
+      return activeNotes;
    }
 }

@@ -14,8 +14,10 @@ export interface SoundSample {
  * @interface
  * @property  {AudioBufferSourceNode | null} source
  * @property  {GainNode | null} gain?
+ * @property  {boolean} active:  (optional) Whether the note is still being "held down".
  */
 export interface NoteNode {
    source: AudioBufferSourceNode | null;
    gain: GainNode | null;
+   active?: boolean;
 }

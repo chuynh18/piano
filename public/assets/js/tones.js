@@ -2,21 +2,26 @@
 "use strict";
 exports.__esModule = true;
 exports.DECAY = {
-    value: 0.8,
+    decay: 0.8,
     halfPedal: 7,
-    setDecay: function (decay) {
-        this.value = decay;
-        return this.value;
+    set: function (key, decay) {
+        if (this.hasOwnProperty(key)) {
+            this[key] = decay;
+            return this[key];
+        }
     },
-    setHalfPedal: function (decay) {
-        this.halfPedal = decay;
-        return this.halfPedal;
-    },
-    get: function () {
-        return this.value;
-    },
-    gethalfPedal: function () {
-        return this.halfPedal;
+    // setDecay: function(decay: number): number {
+    //    this.decay = decay;
+    //    return this.decay;
+    // },
+    // setHalfPedal: function(decay: number) : number {
+    //    this.halfPedal = decay;
+    //    return this.halfPedal;
+    // },
+    get: function (key) {
+        if (this.hasOwnProperty(key)) {
+            return this[key];
+        }
     }
 };
 exports.KEY_COUNT = 88;
@@ -49,7 +54,7 @@ var Keyboard = /** @class */ (function () {
         this.view.resetColor(cfg.key);
     };
     Keyboard.prototype.stopAll = function (force) {
-        var stillPlaying = this.sound.stopAllSamples(force);
+        var stillPlaying = this.sound.setNewDecayAllSamples(force, Globals_1.DECAY.get("decay"));
         for (var i = 0; i < Globals_1.KEY_COUNT; i++) {
             if (stillPlaying.indexOf(i) === -1) {
                 this.view.resetColor(i + 1);
@@ -73,7 +78,6 @@ exports.Keyboard = Keyboard;
 },{"./Globals":1,"./KeyboardSound":3,"./KeyboardView":4,"./interfaces/PianoShared":6}],3:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
-var Globals_1 = require("./Globals");
 /**
  * Exposes methods to play appropriate sound samples based on the pressed key.
  * Samples must be named in counting order (natural numbers starting from 1),
@@ -223,23 +227,23 @@ var KeyboardSound = /** @class */ (function () {
      *
      * @param  {boolean} force
      */
-    KeyboardSound.prototype.stopAllSamples = function (force) {
+    KeyboardSound.prototype.setNewDecayAllSamples = function (force, decay) {
         var activeNotes = [];
         for (var i = 0; i < this.samples.length; i++) {
             var playing = this.samples[i].playing;
             if (playing.length > 0) {
                 if (force) {
                     for (var i_1 = 0; i_1 < playing.length; i_1++) {
-                        playing[i_1].gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + Globals_1.DECAY.get());
-                        playing[i_1].source.stop(this.ctx.currentTime + Globals_1.DECAY.get());
+                        playing[i_1].gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + decay);
+                        playing[i_1].source.stop(this.ctx.currentTime + decay);
                     }
                     playing.length = 0;
                 }
                 else {
                     for (var i_2 = 0; i_2 < playing.length; i_2++) {
                         if (!playing[i_2].active) {
-                            playing[i_2].gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + Globals_1.DECAY.get());
-                            playing[i_2].source.stop(this.ctx.currentTime + Globals_1.DECAY.get());
+                            playing[i_2].gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + decay);
+                            playing[i_2].source.stop(this.ctx.currentTime + decay);
                         }
                         else {
                             if (activeNotes.indexOf(i_2 + 1) !== -1) {
@@ -260,7 +264,7 @@ var KeyboardSound = /** @class */ (function () {
 }());
 exports.KeyboardSound = KeyboardSound;
 
-},{"./Globals":1}],4:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 exports.__esModule = true;
 var KeyboardView = /** @class */ (function () {
@@ -338,11 +342,11 @@ var Player = /** @class */ (function () {
                 if (_this.mode === ProgramState.Interactive) {
                     var damperState = _this.keyboard.getDamper();
                     if (damperState === PianoShared_1.Damper.None) {
-                        cfg.decay = Globals_1.DECAY.get();
+                        cfg.decay = Globals_1.DECAY.get("decay");
                         _this.keyboard.stop(cfg);
                     }
                     else if (damperState === PianoShared_1.Damper.Half) {
-                        cfg.decay = Globals_1.DECAY.gethalfPedal();
+                        cfg.decay = Globals_1.DECAY.get("halfPedal");
                         _this.keyboard.stop(cfg);
                     }
                     else if (damperState === PianoShared_1.Damper.Full) {
@@ -357,11 +361,11 @@ var Player = /** @class */ (function () {
                 if (_this.mode === ProgramState.Interactive) {
                     var damperState = _this.keyboard.getDamper();
                     if (damperState === PianoShared_1.Damper.None) {
-                        cfg.decay = Globals_1.DECAY.get();
+                        cfg.decay = Globals_1.DECAY.get("decay");
                         _this.keyboard.stop(cfg);
                     }
                     else if (damperState === PianoShared_1.Damper.Half) {
-                        cfg.decay = Globals_1.DECAY.gethalfPedal();
+                        cfg.decay = Globals_1.DECAY.get("halfPedal");
                         _this.keyboard.stop(cfg);
                     }
                     else if (damperState === PianoShared_1.Damper.Full) {

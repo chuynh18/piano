@@ -47,10 +47,10 @@ export class Player {
                const damperState = this.keyboard.getDamper();
 
                if (damperState === Damper.None) {
-                  cfg.decay = DECAY.get();
+                  cfg.decay = DECAY.get("decay");
                   this.keyboard.stop(cfg);
                } else if (damperState === Damper.Half) {
-                  cfg.decay = DECAY.gethalfPedal();
+                  cfg.decay = DECAY.get("halfPedal");
                   this.keyboard.stop(cfg);
                } else if (damperState === Damper.Full) {
                   cfg.decay = undefined;
@@ -66,10 +66,10 @@ export class Player {
                const damperState = this.keyboard.getDamper();
 
                if (damperState === Damper.None) {
-                  cfg.decay = DECAY.get();
+                  cfg.decay = DECAY.get("decay");
                   this.keyboard.stop(cfg);
                } else if (damperState === Damper.Half) {
-                  cfg.decay = DECAY.gethalfPedal();
+                  cfg.decay = DECAY.get("halfPedal");
                   this.keyboard.stop(cfg);
                } else if (damperState === Damper.Full) {
                   cfg.decay = undefined;

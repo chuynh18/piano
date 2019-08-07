@@ -27,7 +27,7 @@ export class Keyboard {
    }
 
    public stopAll(force: boolean) {
-      const stillPlaying = this.sound.setNewDecayAllSamples(force, DECAY.get());
+      const stillPlaying = this.sound.setNewDecayAllSamples(force, DECAY.get("decay"));
 
       for (let i = 0; i < KEY_COUNT; i++) {
          if (stillPlaying.indexOf(i) === -1) {

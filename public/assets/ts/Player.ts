@@ -35,49 +35,15 @@ export class Player {
          }
 
          key.addEventListener("mousedown", () => {
-            if (this.mode === ProgramState.Interactive) {
-               this.keyboard.play(cfg);
-            } else if (this.mode === ProgramState.Edit) {
-
-            }
+            this.activateKey(cfg);
          });
 
          key.addEventListener("mouseup", () => {
-            if (this.mode === ProgramState.Interactive) {
-               const damperState = this.keyboard.getDamper();
-
-               if (damperState === Damper.None) {
-                  cfg.decay = DECAY.get("decay");
-                  this.keyboard.stop(cfg);
-               } else if (damperState === Damper.Half) {
-                  cfg.decay = DECAY.get("halfPedal");
-                  this.keyboard.stop(cfg);
-               } else if (damperState === Damper.Full) {
-                  cfg.decay = undefined;
-                  this.keyboard.stopVisuals(cfg);
-               }
-            } else if (this.mode === ProgramState.Edit) {
-               
-            }
+            this.deactivateKey(cfg);
          });
 
          key.addEventListener("mouseout", () => {
-            if (this.mode === ProgramState.Interactive) {
-               const damperState = this.keyboard.getDamper();
-
-               if (damperState === Damper.None) {
-                  cfg.decay = DECAY.get("decay");
-                  this.keyboard.stop(cfg);
-               } else if (damperState === Damper.Half) {
-                  cfg.decay = DECAY.get("halfPedal");
-                  this.keyboard.stop(cfg);
-               } else if (damperState === Damper.Full) {
-                  cfg.decay = undefined;
-                  this.keyboard.stopVisuals(cfg);
-               }
-            } else if (this.mode === ProgramState.Edit) {
-               
-            }
+            this.deactivateKey(cfg);
          });
       }
 
@@ -96,4 +62,32 @@ export class Player {
          damperText.textContent = "On";
       });
    }
+
+   private activateKey(cfg: NoteConfig) {
+      if (this.mode === ProgramState.Interactive) {
+         this.keyboard.play(cfg);
+      } else if (this.mode === ProgramState.Edit) {
+
+      }
+   }
+
+   private deactivateKey(cfg: NoteConfig) {
+      if (this.mode === ProgramState.Interactive) {
+         const damperState = this.keyboard.getDamper();
+
+         if (damperState === Damper.None) {
+            cfg.decay = DECAY.get("decay");
+            this.keyboard.stop(cfg);
+         } else if (damperState === Damper.Half) {
+            cfg.decay = DECAY.get("halfPedal");
+            this.keyboard.stop(cfg);
+         } else if (damperState === Damper.Full) {
+            cfg.decay = undefined;
+            this.keyboard.stopVisuals(cfg);
+         }
+      } else if (this.mode === ProgramState.Edit) {
+         
+      }
+   }
+
 }

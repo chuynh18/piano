@@ -9,18 +9,16 @@ exports.DECAY = {
             this[key] = decay;
             return this[key];
         }
+        else {
+            throw new ReferenceError("Cannot set value of nonexistent key " + key + ".");
+        }
     },
-    // setDecay: function(decay: number): number {
-    //    this.decay = decay;
-    //    return this.decay;
-    // },
-    // setHalfPedal: function(decay: number) : number {
-    //    this.halfPedal = decay;
-    //    return this.halfPedal;
-    // },
     get: function (key) {
         if (this.hasOwnProperty(key)) {
             return this[key];
+        }
+        else {
+            throw new ReferenceError("Cannot get value of nonexistent key " + key + ".");
         }
     }
 };
@@ -332,49 +330,13 @@ var Player = /** @class */ (function () {
                 color: "red"
             };
             key.addEventListener("mousedown", function () {
-                if (_this.mode === ProgramState.Interactive) {
-                    _this.keyboard.play(cfg);
-                }
-                else if (_this.mode === ProgramState.Edit) {
-                }
+                _this.activateKey(cfg);
             });
             key.addEventListener("mouseup", function () {
-                if (_this.mode === ProgramState.Interactive) {
-                    var damperState = _this.keyboard.getDamper();
-                    if (damperState === PianoShared_1.Damper.None) {
-                        cfg.decay = Globals_1.DECAY.get("decay");
-                        _this.keyboard.stop(cfg);
-                    }
-                    else if (damperState === PianoShared_1.Damper.Half) {
-                        cfg.decay = Globals_1.DECAY.get("halfPedal");
-                        _this.keyboard.stop(cfg);
-                    }
-                    else if (damperState === PianoShared_1.Damper.Full) {
-                        cfg.decay = undefined;
-                        _this.keyboard.stopVisuals(cfg);
-                    }
-                }
-                else if (_this.mode === ProgramState.Edit) {
-                }
+                _this.deactivateKey(cfg);
             });
             key.addEventListener("mouseout", function () {
-                if (_this.mode === ProgramState.Interactive) {
-                    var damperState = _this.keyboard.getDamper();
-                    if (damperState === PianoShared_1.Damper.None) {
-                        cfg.decay = Globals_1.DECAY.get("decay");
-                        _this.keyboard.stop(cfg);
-                    }
-                    else if (damperState === PianoShared_1.Damper.Half) {
-                        cfg.decay = Globals_1.DECAY.get("halfPedal");
-                        _this.keyboard.stop(cfg);
-                    }
-                    else if (damperState === PianoShared_1.Damper.Full) {
-                        cfg.decay = undefined;
-                        _this.keyboard.stopVisuals(cfg);
-                    }
-                }
-                else if (_this.mode === ProgramState.Edit) {
-                }
+                _this.deactivateKey(cfg);
             });
         };
         for (var i = 0; i < rects.length; i++) {
@@ -392,6 +354,32 @@ var Player = /** @class */ (function () {
             _this.keyboard.setDamper(PianoShared_1.Damper.Full);
             damperText.textContent = "On";
         });
+    };
+    Player.prototype.activateKey = function (cfg) {
+        if (this.mode === ProgramState.Interactive) {
+            this.keyboard.play(cfg);
+        }
+        else if (this.mode === ProgramState.Edit) {
+        }
+    };
+    Player.prototype.deactivateKey = function (cfg) {
+        if (this.mode === ProgramState.Interactive) {
+            var damperState = this.keyboard.getDamper();
+            if (damperState === PianoShared_1.Damper.None) {
+                cfg.decay = Globals_1.DECAY.get("decay");
+                this.keyboard.stop(cfg);
+            }
+            else if (damperState === PianoShared_1.Damper.Half) {
+                cfg.decay = Globals_1.DECAY.get("halfPedal");
+                this.keyboard.stop(cfg);
+            }
+            else if (damperState === PianoShared_1.Damper.Full) {
+                cfg.decay = undefined;
+                this.keyboard.stopVisuals(cfg);
+            }
+        }
+        else if (this.mode === ProgramState.Edit) {
+        }
     };
     return Player;
 }());

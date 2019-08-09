@@ -93,9 +93,8 @@ export class KeyboardSound {
       });
 
       // create and configure GainNode
-      noteNode.gain = new GainNode(this.ctx, {
-         gain: cfg.volume | 1
-      });
+      noteNode.gain = new GainNode(this.ctx);
+      noteNode.gain.gain.setValueAtTime(cfg.volume, this.ctx.currentTime);
 
       // connect nodes to each other
       noteNode.source.connect(noteNode.gain);
@@ -118,7 +117,7 @@ export class KeyboardSound {
             noteNode.active = false;
          }, cfg.duration);
       } else if (typeof cfg.decay !== "undefined") {
-         console.log("I guess this case does need to be addressed!");
+         // decay provided, but no duration
       }
 
       // play

@@ -152,9 +152,8 @@ var KeyboardSound = /** @class */ (function () {
             buffer: note.buffer
         });
         // create and configure GainNode
-        noteNode.gain = new GainNode(this.ctx, {
-            gain: cfg.volume | 1
-        });
+        noteNode.gain = new GainNode(this.ctx);
+        noteNode.gain.gain.setValueAtTime(cfg.volume, this.ctx.currentTime);
         // connect nodes to each other
         noteNode.source.connect(noteNode.gain);
         noteNode.gain.connect(this.ctx.destination);
@@ -174,7 +173,7 @@ var KeyboardSound = /** @class */ (function () {
             }, cfg.duration);
         }
         else if (typeof cfg.decay !== "undefined") {
-            console.log("I guess this case does need to be addressed!");
+            // decay provided, but no duration
         }
         // play
         noteNode.source.start(0);
@@ -314,12 +313,21 @@ var Player = /** @class */ (function () {
     function Player(svgId) {
         this.mode = ProgramState.Interactive;
         this.keyboard = new Keyboard_1.Keyboard();
+        // get SVG document and save reference into this.svg
         var element = document.getElementById(svgId);
         this.svg = element.contentDocument;
+        this.volume = document.getElementById("volume");
+        // attach event handlers
         this.attachEventHandlers();
     }
+    /**
+     * Attaches event handlers to each rect element of the SVG.
+     *
+     * Event handlers attached are contextmenu, mousedown, mouseup, and mouseout.
+     */
     Player.prototype.attachEventHandlers = function () {
         var _this = this;
+        // grab rect elements inside SVG (rects is an HTMLCollection)
         var rects = this.svg.getElementsByTagName("rect");
         var damperText = document.getElementById("damper-state");
         var _loop_1 = function (i) {
@@ -329,42 +337,76 @@ var Player = /** @class */ (function () {
                 volume: 1,
                 color: "red"
             };
-            key.addEventListener("mousedown", function () {
-                _this.activateKey(cfg);
+            // prevent right click context menu on keyboard
+            key.addEventListener("contextmenu", function (event) {
+                event.preventDefault();
+            }, false);
+            // key clicked event handler
+            key.addEventListener("mousedown", function (event) {
+                _this.activateKey(event, cfg);
             });
+            // key released event handler (no more click)
             key.addEventListener("mouseup", function () {
                 _this.deactivateKey(cfg);
             });
+            // key released event handler (mouse out)
             key.addEventListener("mouseout", function () {
                 _this.deactivateKey(cfg);
             });
         };
+        // for each of the 88 keys on the piano...
         for (var i = 0; i < rects.length; i++) {
             _loop_1(i);
         }
+        // global volume slider
+        this.volume.addEventListener("input", function () {
+            document.getElementById("volume-value").textContent = String(Math.floor(100 * Number(_this.volume.value)));
+        });
+        // damper pedal off
         document.getElementById("damper0").addEventListener("click", function () {
             _this.keyboard.setDamper(PianoShared_1.Damper.None);
             damperText.textContent = "Off";
         });
+        // damper pedal half
         document.getElementById("damper1").addEventListener("click", function () {
             _this.keyboard.setDamper(PianoShared_1.Damper.Half);
             damperText.textContent = "Half";
         });
+        // damper pedal on
         document.getElementById("damper2").addEventListener("click", function () {
             _this.keyboard.setDamper(PianoShared_1.Damper.Full);
             damperText.textContent = "On";
         });
     };
-    Player.prototype.activateKey = function (cfg) {
+    /**
+     * Activation of a key on the keyboard (in other words, play a note).
+     *
+     * @param  {MouseEvent} e - the MouseEvent (to identify left vs right-click)
+     * @param  {NoteConfig} cfg - NoteConfig object
+     */
+    Player.prototype.activateKey = function (e, cfg) {
         if (this.mode === ProgramState.Interactive) {
-            this.keyboard.play(cfg);
+            // set value of volume on NoteConfig object
+            cfg.volume = Number(this.volume.value);
+            if (e.button === 0) {
+                this.keyboard.play(cfg);
+            }
         }
         else if (this.mode === ProgramState.Edit) {
         }
     };
+    /**
+     * Stop playing a note.  Behavior differs based on pedal state.
+     *
+     * @param  {NoteConfig} cfg - Note configuration object.
+     */
     Player.prototype.deactivateKey = function (cfg) {
         if (this.mode === ProgramState.Interactive) {
+            // set value of volume on NoteConfig
+            cfg.volume = Number(this.volume.value);
+            // grab damper value
             var damperState = this.keyboard.getDamper();
+            // set appropriate decay value on NoteConfig
             if (damperState === PianoShared_1.Damper.None) {
                 cfg.decay = Globals_1.DECAY.get("decay");
                 this.keyboard.stop(cfg);

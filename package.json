@@ -5,7 +5,11 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "tsc": "tsc ./public/assets/ts/*.ts",
+    "browserify": "browserify ./public/assets/ts/main.js -o ./public/assets/js/tones.js",
+    "cleanup": "rm ./public/assets/ts/*js && rm ./public/assets/ts/interfaces/*js",
+    "build": "npm run tsc && npm run browserify && npm run cleanup"
   },
   "keywords": [
     "piano"

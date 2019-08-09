@@ -1,6 +1,6 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.DECAY = {
     decay: 0.8,
     halfPedal: 7,
@@ -26,7 +26,7 @@ exports.KEY_COUNT = 88;
 
 },{}],2:[function(require,module,exports){
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Globals_1 = require("./Globals");
 var PianoShared_1 = require("./interfaces/PianoShared");
 var KeyboardSound_1 = require("./KeyboardSound");
@@ -75,7 +75,7 @@ exports.Keyboard = Keyboard;
 
 },{"./Globals":1,"./KeyboardSound":3,"./KeyboardView":4,"./interfaces/PianoShared":6}],3:[function(require,module,exports){
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Exposes methods to play appropriate sound samples based on the pressed key.
  * Samples must be named in counting order (natural numbers starting from 1),
@@ -263,7 +263,7 @@ exports.KeyboardSound = KeyboardSound;
 
 },{}],4:[function(require,module,exports){
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var KeyboardView = /** @class */ (function () {
     function KeyboardView(svgId) {
         var element = document.getElementById(svgId);
@@ -299,7 +299,7 @@ exports.KeyboardView = KeyboardView;
 
 },{}],5:[function(require,module,exports){
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Keyboard_1 = require("./Keyboard");
 var PianoShared_1 = require("./interfaces/PianoShared");
 var Globals_1 = require("./Globals");
@@ -339,6 +339,7 @@ var Player = /** @class */ (function () {
             };
             // prevent right click context menu on keyboard
             key.addEventListener("contextmenu", function (event) {
+                console.log("right click");
                 event.preventDefault();
             }, false);
             // key clicked event handler
@@ -429,7 +430,7 @@ exports.Player = Player;
 
 },{"./Globals":1,"./Keyboard":2,"./interfaces/PianoShared":6}],6:[function(require,module,exports){
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Damper;
 (function (Damper) {
     Damper[Damper["None"] = 0] = "None";
@@ -439,7 +440,7 @@ var Damper;
 
 },{}],7:[function(require,module,exports){
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Player_1 = require("./Player");
 var player;
 window.addEventListener("load", function () {

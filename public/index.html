@@ -5,26 +5,54 @@
    <meta charset="utf-8" />
    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
    <link rel="icon" href="assets/img/favicon.png">
-   <title>Keyboard test</title>
+   <title>Keyboard</title>
 </head>
 
 <body>
-   <h1>Keyboard test</h1>
+   <h1>Keyboard<span id="now-playing"></span></h1>
+   
    <object id="kb" data="assets/img/fullpiano.svg" type="image/svg+xml">
       Check your SVG support!
    </object>
-   <
-   <div>
-      <p>Volume: <span id="volume-value">100</span>%</p>
-      <p><input id="volume" type="range" min="0" max="1" value="1" step="0.05" /></p>
+
+   <div class="setting" id="global-setting">
+      <div>
+         <p>Volume: <span id="volume-value">100</span>%</p>
+         <p><input id="volume" type="range" min="0" max="1" value="1" step="0.05" /></p>
+      </div>
+      <div>
+         <p>Damper state: <b><span id="damper-state">Off</span></b></p>
+         <p><button id="damper0">Damper pedal OFF</button></p>
+         <p><button id="damper1">Damper pedal HALF</button></p>
+         <p><button id="damper2">Damper pedal ON</button></p>
+      </div>
    </div>
-   <div>
-      <p>Damper state: <b><span id="damper-state">Off</span></b></p>
-      <p><button id="damper0">Damper pedal OFF</button></p>
-      <p><button id="damper1">Damper pedal HALF</button></p>
-      <p><button id="damper2">Damper pedal ON</button></p>
+
+   <div class="setting" id="beat-setting">
+
    </div>
-   
+
+   <div class="setting" id="note-setting">
+
+   </div>
+
+   <div id="music-editor">
+      <p>Title: <input class="text-input" id="editor-title" type="text" name="title" /></p>
+      <p>Composer: <input class="text-input" id="editor-composer" type="text" name="composer" /></p>
+      <p>Section name: <input class="text-input" id="editor-section" type="text" name="editor-section" /></p>
+      <p>Tempo (bpm): <input class="number-input" id="editor-tempo" type="number" min="20" max="250" value="60" name="tempo" /></p>
+      <p>
+         Shortest possible note:
+         <label><input type="radio" id="editor-whole" name="shortest-note" value="whole" />Whole</label>
+         <label><input type="radio" id="editor-half" name="shortest-note" value="half" />Half</label>
+         <label><input type="radio" id="editor-quarter" name="shortest-note" value="quarter" />Quarter</label>
+         <label><input type="radio" id="editor-eighth" name="shortest-note" value="eighth" />Eighth</label>
+         <label><input type="radio" id="editor-sixteenth" name="shortest-note" value="sixteenth" />Sixteenth</label>
+         <label><input type="radio" id="editor-thirty-second" name="shortest-note" value="thirty-second" />Thirty-second</label>
+      </p>
+      <p><button id="editor-create">Create</button></p>
+   </div>
+
    <script src="assets/js/tones.js"></script>
 </body>
 

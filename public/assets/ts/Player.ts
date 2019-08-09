@@ -47,7 +47,6 @@ export class Player {
 
          // prevent right click context menu on keyboard
          key.addEventListener("contextmenu", event => {
-            console.log("right click");
             event.preventDefault();
          }, false);
 

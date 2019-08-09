@@ -176,46 +176,57 @@ export class KeyboardSound {
     * that do not correspond to a note being actively pressed.)  If the force
     * flag is set to true, all samples are stopped.
     * 
-    * @param  {boolean} force
+    * @param  {boolean} force - If true, stops all samples.  If false, stops
+    * only samples flagged as inactive.
+    * @param  {number} decay - New value of decay to apply.
     */
    public setNewDecayAllSamples(force: boolean, decay: number): number[] {
+      // list of active notes (by key number, NOT array index)
       const activeNotes: number[] = [];
 
+      // iterate over the list of sound samples
       for (let i = 0; i < this.samples.length; i++) {
+
+         // queue of notes being played for a particular sound sample (piano key)
          const playing = this.samples[i].playing;
 
+         // if there are playing sound samples...
          if (playing.length > 0) {
+            // ...and force is truthy, apply new decay to all sound samples...
             if (force) {
-               for (let i = 0; i < playing.length; i++) {
-                  playing[i].gain!.gain.exponentialRampToValueAtTime(0.00001,
+               for (let j = 0; j < playing.length; j++) {
+                  playing[j].gain!.gain.exponentialRampToValueAtTime(0.00001,
                      this.ctx.currentTime + decay);
 
-                  playing[i].source!.stop(this.ctx.currentTime + decay);
+                  playing[j].source!.stop(this.ctx.currentTime + decay);
                }
 
                playing.length = 0;
+            // ...else, only apply the new decay to inactive sound samples
             } else {
-               for (let i = 0; i < playing.length; i++) {
-                  if (!playing[i].active) {
-                     playing[i].gain!.gain.exponentialRampToValueAtTime(0.00001,
+               for (let j = 0; j < playing.length; j++) {
+                  // apply new decay to inactive samples
+                  if (!playing[j].active) {
+                     playing[j].gain!.gain.exponentialRampToValueAtTime(0.00001,
                         this.ctx.currentTime + decay);
    
-                     playing[i].source!.stop(this.ctx.currentTime + decay);
+                     playing[j].source!.stop(this.ctx.currentTime + decay);
+                  // do not modify active notes, but record their note number
                   } else {
-                     if (activeNotes.indexOf(i + 1) !== -1) {
-                        activeNotes.push(i + 1);
+                     if (activeNotes.indexOf(j + 1) !== -1) {
+                        activeNotes.push(j + 1);
                      }
                   }
-
-                  this.samples[i].playing = playing.filter(val => {
-                     return val.active;
-                  });
                }
+
+               // mutate playing queue to only contain remaining active notes
+               this.samples[i].playing = playing.filter(val => {
+                  return val.active;
+               });
             }
          }
       }
 
-      console.log(activeNotes);
       return activeNotes;
    }
 }

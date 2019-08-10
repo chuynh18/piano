@@ -152,7 +152,7 @@ export class KeyboardSound {
                      this.ctx.currentTime + cfg.decay);
                   
                   noteNode.source!.stop(this.ctx.currentTime + cfg.decay);
-               } // else {
+               } // else { // commented out because this forces decays on notes without explicit decays
                //    noteNode.gain!.gain.exponentialRampToValueAtTime(0.00001,
                //       this.ctx.currentTime + DECAY.get());
 

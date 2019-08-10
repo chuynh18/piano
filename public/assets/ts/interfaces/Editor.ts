@@ -1,3 +1,5 @@
+import { NoteConfig } from "./PianoShared";
+
 /**
  * Song object.  Contains all data necessary to play back a piece of music.
  * @interface
@@ -46,12 +48,8 @@ export interface Measure {
  * will be played at a point in time.
  */
 export interface Beat {
-
+   notes: NoteConfig[];
 }
 
-/**
- * One note and all its associated data (volume and ornamentation).
- */
-export interface Note {
-
-}
+// Note interface not specified here because it already exists.  See NoteConfig
+// in PianoShared (imported at the top of this file).

@@ -17,6 +17,7 @@
 
    <div class="setting" id="global-setting">
       <div>
+         <p class="setting-title">Global settings</p>
          <p>Volume: <span id="volume-value">100</span>%</p>
          <p><input id="volume" type="range" min="0" max="1" value="1" step="0.05" /></p>
       </div>
@@ -28,15 +29,25 @@
       </div>
    </div>
 
-   <div class="setting" id="beat-setting">
+   <div class="setting" id="editor-setting">
+      <p class="setting-title">Editor settings</p>
+      <p>
+         Selected track (hand):
+         <label><input type="radio" id="editor-left" name="hand" value="left" />Left hand</label>
+         <label><input type="radio" id="editor-right" name="hand" value="right" checked />Right hand</label>
+      </p>
+   </div>
 
+   <div class="setting" id="beat-setting">
+      <p class="setting-title">Beat settings</p>
    </div>
 
    <div class="setting" id="note-setting">
-
+         <p class="setting-title">Note settings</p>
    </div>
 
    <div id="music-editor">
+      <p class="setting-title">New song</p>
       <p>Title: <input class="text-input" id="editor-title" type="text" name="title" /></p>
       <p>Composer: <input class="text-input" id="editor-composer" type="text" name="composer" /></p>
       <p>Section name: <input class="text-input" id="editor-section" type="text" name="editor-section" /></p>
@@ -47,7 +58,7 @@
          <label><input type="radio" id="editor-half" name="shortest-note" value="half" />Half</label>
          <label><input type="radio" id="editor-quarter" name="shortest-note" value="quarter" />Quarter</label>
          <label><input type="radio" id="editor-eighth" name="shortest-note" value="eighth" />Eighth</label>
-         <label><input type="radio" id="editor-sixteenth" name="shortest-note" value="sixteenth" />Sixteenth</label>
+         <label><input type="radio" id="editor-sixteenth" name="shortest-note" value="sixteenth" checked />Sixteenth</label>
          <label><input type="radio" id="editor-thirty-second" name="shortest-note" value="thirty-second" />Thirty-second</label>
       </p>
       <p><button id="editor-create">Create</button></p>

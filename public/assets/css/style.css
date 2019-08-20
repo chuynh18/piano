@@ -1,0 +1,9 @@
+.setting {
+   border: black solid 1px;
+   padding: 10px;
+}
+
+.setting-title {
+   font-size: 14pt;
+   font-weight: bold;
+}
